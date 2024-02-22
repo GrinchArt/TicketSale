@@ -6,6 +6,7 @@ The main page serves as the entry point for users seeking to purchase tickets fo
 It is structured to provide a streamlined experience for searching and browsing popular travel routes.
 
 Elements for interaction:
+
 /////////////
 Header Section:
 - Logo: Placeholder for the company logo that may serve as a home button.
