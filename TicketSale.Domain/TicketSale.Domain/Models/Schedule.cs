@@ -12,6 +12,6 @@ namespace TicketSale.Domain.Models
         public int RouteId { get; set; }
         public DateTime DepartureTime { get; set; }
         public DateTime ArrivalTime { get; set; }
-        public int AvaiableSeats { get; set; }
+        public int AvailableSeats { get; set; }
     }
 }
