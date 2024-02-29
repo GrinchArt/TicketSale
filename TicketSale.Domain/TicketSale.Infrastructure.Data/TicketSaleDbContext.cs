@@ -24,14 +24,8 @@ namespace TicketSale.Infrastructure.Data
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new BookingEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new BookingStatusEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new RouteEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ScheduleEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new TicketEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new TransportEntityConfiguration());
+            base.OnModelCreating(modelBuilder);          
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(TicketSaleDbContext).Assembly);
         }
     }
 }
