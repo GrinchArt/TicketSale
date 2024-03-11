@@ -1,0 +1,130 @@
+﻿@model IEnumerable<TicketSale.WebUI.Models.RouteScheduleViewModel>
+
+@{
+    ViewData["Title"] = "Main Page";
+}
+
+<div class="container">
+    <h1 class="display-4 text-center">Welcome to Ticket Sale</h1>
+    <p class="text-center">Find and book your tickets for any destination.</p>
+
+
+    <form id="searchForm" method="get" asp-controller="Home" asp-action="Search">
+        <div class="form-row">
+
+            <div class="form-group col-md-6">
+                <label for="from">From:</label>
+                <input type="text" class="form-control" id="from" name="From" placeholder="Start typing...">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="to">To:</label>
+                <select class="form-control" id="to" name="To">
+                </select>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="departureDate">Departure date:</label>
+                <input type="date" class="form-control" id="departureDate" name="DepartureDate">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="returnDate">Return date:</label>
+                <input type="date" class="form-control" id="returnDate" name="ReturnDate">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" >Search</button>
+    </form>
+
+    <!-- Popular routes -->
+    <div class="row mt-4">
+        <h2 class="col-12">Popular routes</h2>
+        @foreach (var route in Model.Take(6)) // temporary
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100" style="border:solid 2px;">
+                    <img class="card-img-top" src="~/images/image2.jpg" alt="Card image cap" style="width: 50%; height: auto;"> <!-- Змінено розміри зображення -->
+                    <div class="card-body">
+                        <h5 class="card-title">@route.RouteInfo.PlaceOfDeparture - @route.RouteInfo.PlaceOfDestination</h5>
+                        @if (route.Schedules.Any())
+                        {
+                            var schedule = route.Schedules.First();
+                            <p class="card-text">@schedule.DepartureTime.ToString("dd MMM yyyy HH:mm") - @schedule.ArrivalTime.ToString("dd MMM yyyy HH:mm")</p>
+                        }
+                        <p class="card-text">Price: from [here will be price]</p> <!-- To be changed -->
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#from').on('input', function () {
+                var fromValue = $(this).val();
+                // AJAX запит для отримання доступних місць призначення
+                $.getJSON('@Url.Action("GetDestinations", "Home")', { from: fromValue }, function (destinations) {
+                    var $to = $('#to');
+                    $to.empty();
+                    $.each(destinations, function () {
+                        $to.append($('<option></option>').val(this).text(this));
+                    });
+                });
+            });
+
+            $('#searchForm').submit(function (e) {
+                
+                var form = $(this);
+                $.ajax({
+                    url: form.attr('action'),
+                    data: form.serialize(), // Отримати дані форми
+                    type: 'GET',
+                    success: function (result) {
+                        // Якщо маршрутів не знайдено, знайти найближчі по даті
+                        if (result.isEmpty) {
+                            alert('No routes found on the selected date. Showing next available routes.');
+                        }
+                        // Оновлення UI з результатами
+                        $('#search-results-container').html(result);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+@* @section Scripts {
+    <script>
+        var departureDateInput = document.getElementById('departureDate');
+        var returnDateInput = document.getElementById('returnDate');
+
+        function updateReturnDateMin() {
+            returnDateInput.min = departureDateInput.value;
+        }
+
+        departureDateInput.addEventListener('change', updateReturnDateMin);
+        returnDateInput.addEventListener('change', function () {
+            if (returnDateInput.value < departureDateInput.value) {
+                returnDateInput.value = departureDateInput.value;
+            }
+        });
+
+        document.getElementById('searchForm').addEventListener('submit', function (e) {
+            var departureDate = departureDateInput.value;
+            var returnDate = returnDateInput.value;
+
+            if (returnDate && departureDate && returnDate < departureDate) {
+                alert('Return date cannot be earlier than departure date.');
+                e.preventDefault();
+            }
+        });
+    </script>
+} *@
