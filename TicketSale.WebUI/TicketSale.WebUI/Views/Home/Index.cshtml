@@ -41,7 +41,7 @@
         {
             <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
                 <div class="card h-100" style="border:solid 2px;">
-                    <img class="card-img-top" src="~/images/image2.jpg" alt="Card image cap" style="width: 50%; height: auto;"> <!-- Змінено розміри зображення -->
+                    <img class="card-img-top" src="~/images/image2.jpg" alt="Card image cap" style="width: 50%; height: auto;">
                     <div class="card-body">
                         <h5 class="card-title">@route.RouteInfo.PlaceOfDeparture - @route.RouteInfo.PlaceOfDestination</h5>
                         @if (route.Schedules.Any())
@@ -64,7 +64,7 @@
         $(document).ready(function () {
             $('#from').on('input', function () {
                 var fromValue = $(this).val();
-                // AJAX запит для отримання доступних місць призначення
+
                 $.getJSON('@Url.Action("GetDestinations", "Home")', { from: fromValue }, function (destinations) {
                     var $to = $('#to');
                     $to.empty();
@@ -74,19 +74,16 @@
                 });
             });
 
-            $('#searchForm').submit(function (e) {
-                
+            $('#searchForm').submit(function (e) {              
                 var form = $(this);
                 $.ajax({
                     url: form.attr('action'),
-                    data: form.serialize(), // Отримати дані форми
+                    data: form.serialize(),
                     type: 'GET',
                     success: function (result) {
-                        // Якщо маршрутів не знайдено, знайти найближчі по даті
                         if (result.isEmpty) {
                             alert('No routes found on the selected date. Showing next available routes.');
                         }
-                        // Оновлення UI з результатами
                         $('#search-results-container').html(result);
                     }
                 });

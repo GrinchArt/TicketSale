@@ -74,7 +74,7 @@
 
 <script>
     function loadPage(pageNumber) {
-        // Збираємо дані для пошуку з форми або іншого джерела
+
         var searchParams = {
             from: "@Model.Criteria.From",
             to: "@Model.Criteria.To",
@@ -88,7 +88,7 @@
             data: searchParams,
             type: 'GET',
             success: function (data) {
-                // Припускаємо, що у вас є контейнер для результатів пошуку
+    
                 $('#search-results-container').html(data);
             }
         });
