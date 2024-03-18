@@ -1,0 +1,58 @@
+﻿@model TicketSale.Domain.Route
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Create new Route</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateRoute" asp-controller="Admin">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="CountryOfDeparture" class="control-label">Country of Departure</label>
+                <input asp-for="CountryOfDeparture" class="form-control" />
+                <span asp-validation-for="CountryOfDeparture" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlaceOfDeparture" class="control-label">Place of Departure</label>
+                <input asp-for="PlaceOfDeparture" class="form-control" />
+                <span asp-validation-for="PlaceOfDeparture" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CountryOfDestination" class="control-label">Country of Destination</label>
+                <input asp-for="CountryOfDestination" class="form-control" />
+                <span asp-validation-for="CountryOfDestination" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PlaceOfDestination" class="control-label">Place of Destination</label>
+                <input asp-for="PlaceOfDestination" class="form-control" />
+                <span asp-validation-for="PlaceOfDestination" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TransportTypeId" class="control-label"></label>
+                <select asp-for="TransportTypeId" asp-items="@(new SelectList((IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewData["TransportTypeId"], "Value", "Text"))" class="form-control">
+                    <option value="">-- Choose the transport type --</option>
+                </select>
+                <span asp-validation-for="TransportTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="MainAdminPage">Back to main Admin page</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

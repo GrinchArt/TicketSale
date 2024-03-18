@@ -1,0 +1,118 @@
+﻿@model TicketSale.WebUI.Models.AdminMainPageView
+
+@{
+    ViewData["Title"] = "Routes with Schedules";
+}
+
+
+<h2>@ViewData["Title"]</h2>
+
+
+
+
+<div class="col-container">
+    <div class="col-md-2">
+        <div>
+            <a asp-controller="Admin" asp-action="CreateRoute">Create new Route</a>
+        </div>
+        <div>
+            <a asp-controller="Admin" asp-action="CreateSchedule">Create new Schedule</a>
+        </div>
+        <div>
+            <a asp-controller="Admin" asp-action="UserList">User List</a>
+        </div>
+
+    </div>
+
+
+    <div class="col">
+        <h3>Routes</h3>
+        <div class="scrollable-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Place of Departure</th>
+                        <th>Place of Destination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var route in Model.Routes)
+                    {
+                        <tr>
+                            <td>@route.Id</td>
+                            <td>@route.PlaceOfDeparture - @route.CountryOfDeparture</td>
+                            <td>@route.PlaceOfDestination - @route.CountryOfDestination</td>
+                            <td>
+                                <a href="@Url.Action("EditRoute", "Admin", new { id = route.Id })" class="btn btn-primary btn-sm">Edit</a>
+
+                                @using (Html.BeginForm("DeleteRoute", "Admin", new { id = route.Id }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col">
+        <h3>Schedules</h3>
+        <div class="scrollable-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Departure Time</th>
+                        <th>Arrival Time</th>
+                        <th>Available Seats</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var schedule in Model.Schedules)
+                    {
+                        <tr>
+                            <td>@schedule.RouteId</td>
+                            <td>@schedule.DepartureTime</td>
+                            <td>@schedule.ArrivalTime</td>
+                            <td>@schedule.AvailableSeats</td>
+                            <td>
+                                <a href="@Url.Action("EditSchedule", "Admin", new { id = schedule.Id })" class="btn btn-primary btn-sm">Edit</a>
+
+                                @using (Html.BeginForm("DeleteSchedule", "Admin", new { id = schedule.Id }, FormMethod.Post))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .scrollable-table {
+        max-height: 60vh;
+        overflow-y: scroll;
+        display: block;
+    }
+
+    .col-container {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .col {
+        flex: 1;
+        padding: 0 10px;
+    }
+</style>
+
+

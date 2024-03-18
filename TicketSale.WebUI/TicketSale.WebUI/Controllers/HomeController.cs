@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using TicketSale.Domain;
 using TicketSale.Infrastructure.Data;
 using TicketSale.WebUI.Models;
+using TicketSale.WebUI.Services;
 using TicketSale.WebUI.TicketSearchService;
 
 namespace TicketSale.WebUI.Controllers
@@ -13,14 +16,16 @@ namespace TicketSale.WebUI.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly TicketSaleDbContext _ticketSaleDbContext;
         private readonly SearchService _searchService;
+        private readonly PurchaseTicketService _purchaseService;
+        private readonly UserManager<Customer> _userManager;
 
-
-        public HomeController(ILogger<HomeController> logger, TicketSaleDbContext ticketSaleDbContext, SearchService searchService)
+        public HomeController(ILogger<HomeController> logger, TicketSaleDbContext ticketSaleDbContext, SearchService searchService, UserManager<Customer> userManager, PurchaseTicketService purchaseService)
         {
             _logger = logger;
             _ticketSaleDbContext = ticketSaleDbContext;
             _searchService = searchService;
- 
+            _userManager = userManager;
+            _purchaseService= purchaseService;
         }
        
         public IActionResult Index()
@@ -37,20 +42,28 @@ namespace TicketSale.WebUI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Search(string from, string to, DateTime? departureDate, DateTime? returnDate, int page = 1)
+        public IActionResult Search(SearchCriteria criteria, int page = 1)
         {
-            var criteria = new SearchCriteria
+            if (string.IsNullOrWhiteSpace(criteria.From))
             {
-                From = from,
-                To = to,
-                DepartureDate = departureDate,
-                ReturnDate = returnDate
+                ModelState.AddModelError("From", "Please enter a departure place.");
+            }
+            if (string.IsNullOrWhiteSpace(criteria.To))
+            {
+                ModelState.AddModelError("To", "Please enter an arrival place.");
+            }
+            var criteriaToSearch = new SearchCriteria
+            {
+                From = criteria.From,
+                To = criteria.To,
+                DepartureDate = criteria.DepartureDate,
+                ReturnDate = criteria.ReturnDate
             };
-            const int pageSize = 6;
+            const int pageSize = 4;
             var searchResult = _searchService.SearchRoutes(criteria);
             var pagedResult = searchResult.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
-            if (!searchResult.Any() && departureDate.HasValue)
+            if (!searchResult.Any() && criteria.DepartureDate.HasValue)
             {
                 searchResult = _searchService.SearchRoutesAfterDate(criteria);
             }
@@ -66,6 +79,49 @@ namespace TicketSale.WebUI.Controllers
             return View("SearchResult", viewModel);
         }
 
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpGet]
+        public async  Task<IActionResult> Purchase(int scheduleId, int price)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            Random rand = new Random();
+            var model = new PurchaseTicketViewModel
+            {
+                ScheduleId = scheduleId,
+                FirstName = user.FirstName, 
+                LastName = user.LastName,
+                Email = user.Email,
+                Price = price
+            };
+
+            return View(model);
+        }
+
+
+        [Authorize(Roles = "User,Admin")]
+        [HttpPost]
+        public async Task<IActionResult> Purchase(PurchaseTicketViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            decimal finalPrice = model.Price;
+            //if (model.IsWithPet) finalPrice += 50;
+            //if (model.IsWithBaggage) finalPrice += 50;
+            //if (!model.IsOneWay) finalPrice *= 1.7m;
+            var s = await _purchaseService.PurchaseTicket(model);
+            _ticketSaleDbContext.Add(s);
+            _ticketSaleDbContext.SaveChanges();
+            return RedirectToAction("Index", "Home");
+        }
+
         [HttpGet]
         public IActionResult GetDestinations(string from)
         {
@@ -77,29 +133,6 @@ namespace TicketSale.WebUI.Controllers
 
             return Ok(destinations);
         }
-
-
-
-        //public IActionResult PopularRoutes(int page = 1)
-        //{
-        //    const int pageSize = 6;
-        //    var routesQuery = _ticketSaleDbContext.Routes.AsQueryable(); 
-
-        //    var pagedRoutes = routesQuery.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-        //    var totalRoutes = routesQuery.Count();
-
-        //    var viewModel = new PopularRoutesViewModel
-        //    {
-        //        Routes = pagedRoutes,
-        //        CurrentPage = page,
-        //        TotalPages = (int)Math.Ceiling(totalRoutes / (double)pageSize)
-        //    };
-
-        //    return PartialView("_PopularRoutes", viewModel);
-        //}
-
-
-
 
 
         public IActionResult Privacy()

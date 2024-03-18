@@ -17,17 +17,35 @@ namespace TicketSale.WebUI.TicketSearchService
 
         public IEnumerable<RouteScheduleViewModel> SearchRoutes(SearchCriteria criteria)
         {
- 
-            var routes = _ticketSaleDbContext.Routes
-                .Where(r => r.PlaceOfDeparture == criteria.From && r.PlaceOfDestination == criteria.To)
-                .ToList();
 
+            var routesQuery = _ticketSaleDbContext.Routes.AsQueryable();
 
-            var schedules = _ticketSaleDbContext.Schedules
-                .Where(s => routes.Select(r => r.Id).Contains(s.RouteId))
-                .ToList();
+            // Basic filters
+            if (!string.IsNullOrWhiteSpace(criteria.From))
+            {
+                routesQuery = routesQuery.Where(r => r.PlaceOfDeparture == criteria.From);
+            }
+            if (!string.IsNullOrWhiteSpace(criteria.To))
+            {
+                routesQuery = routesQuery.Where(r => r.PlaceOfDestination == criteria.To);
+            }
 
-            // Формуємо вихідні дані
+            var routes = routesQuery.ToList();
+            var schedulesQuery = _ticketSaleDbContext.Schedules.AsQueryable();
+
+            // Date filters
+            if (criteria.DepartureDate.HasValue)
+            {
+                schedulesQuery = schedulesQuery.Where(s => s.DepartureTime >= criteria.DepartureDate.Value);
+            }
+            if (criteria.ReturnDate.HasValue)
+            {
+                schedulesQuery = schedulesQuery.Where(s => s.ArrivalTime <= criteria.ReturnDate.Value);
+            }
+
+            var schedules = schedulesQuery.ToList();
+
+            //Output result
             var result = routes.Select(route => new RouteScheduleViewModel
             {
                 RouteInfo = route,

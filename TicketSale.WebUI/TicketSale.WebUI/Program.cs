@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using TicketSale.Domain;
 using TicketSale.WebUI.Areas;
 using TicketSale.WebUI.TicketSearchService;
+using TicketSale.WebUI.Services;
 
 
 namespace TicketSale.WebUI
@@ -30,6 +31,7 @@ namespace TicketSale.WebUI
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<SearchService>();
+            builder.Services.AddScoped<PurchaseTicketService>();
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())

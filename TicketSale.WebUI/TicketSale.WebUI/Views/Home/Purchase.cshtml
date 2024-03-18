@@ -1,0 +1,77 @@
+﻿@model PurchaseTicketViewModel
+
+<form method="post" action="@Url.Action("Purchase", "Home")" class="container mt-4">
+    <input type="hidden" name="scheduleId" value="@Model.ScheduleId" />
+    <input type="hidden" name="Price" value="@Model.Price" />
+    <h2>Purchase Ticket</h2>
+
+    <!-- Customer Information -->
+
+
+    <div class="form-group">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="FirstName" class="form-control" value="@Model.FirstName" readonly />
+    </div>
+    <div class="form-group">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="LastName" class="form-control" value="@Model.LastName" readonly />
+    </div>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="Email" class="form-control" value="@Model.Email" readonly />
+    </div>
+    <div class="form-group">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="tel" id="phoneNumber" name="PhoneNumber" class="form-control" />
+    </div>
+
+    <!-- Ticket Options -->
+    <div class="form-group form-check">
+        <input type="checkbox" id="isOneWay" name="IsOneWay" class="form-check-input" />
+        <label class="form-check-label" for="isOneWay">One-way trip</label>
+    </div>
+    <div class="form-group form-check">
+        <input type="checkbox" id="isWithPets" name="IsWithPet" class="form-check-input" />
+        <label class="form-check-label" for="isWithPets">With pets</label>
+    </div>
+    <div class="form-group form-check">
+        <input type="checkbox" id="isWithBaggage" name="IsWithBaggage" class="form-check-input" />
+        <label class="form-check-label" for="isWithBaggage">With baggage</label>
+    </div>
+   @*  <div class="form-group">
+        <label for="seatNumber">Seat number:</label>
+        <input type="text" id="seatNumber" name="SeatNumber" class="form-control" />
+    </div> *@
+
+    <div class="form-group">
+        <label>Price:</label>
+        <p>@Model.Price $</p>
+    </div>
+
+    <button asp-action="Purchase" asp-controller="Home" type="submit" class="btn btn-success">Confirm Purchase</button>
+</form>
+
+
+@section Scripts {
+    <script>
+        function updatePrice() {
+            var basePrice = @Model.Price;
+            var isWithPet = document.getElementById('isWithPets').checked;
+            var isWithBaggage = document.getElementById('isWithBaggage').checked;
+            var isOneWay = document.getElementById('isOneWay').checked;
+
+            var finalPrice = basePrice;
+
+            if (isWithPet) finalPrice += 50;
+            if (isWithBaggage) finalPrice += 50;
+            if (!isOneWay) finalPrice *= 1.7;
+
+            document.getElementById('finalPrice').textContent = finalPrice.toFixed(2) + " $";
+        }
+        document.getElementById('isWithPets').addEventListener('change', updatePrice);
+        document.getElementById('isWithBaggage').addEventListener('change', updatePrice);
+        document.getElementById('isOneWay').addEventListener('change', updatePrice);
+
+        window.onload = updatePrice;
+    </script>
+}

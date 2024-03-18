@@ -11,35 +11,39 @@
 
     <form id="searchForm" method="get" asp-controller="Home" asp-action="Search">
         <div class="form-row">
-
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-2">
                 <label for="from">From:</label>
                 <input type="text" class="form-control" id="from" name="From" placeholder="Start typing...">
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-2">
                 <label for="to">To:</label>
                 <select class="form-control" id="to" name="To">
                 </select>
             </div>
-
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label for="departureDate">Departure date:</label>
                 <input type="date" class="form-control" id="departureDate" name="DepartureDate">
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
                 <label for="returnDate">Return date:</label>
                 <input type="date" class="form-control" id="returnDate" name="ReturnDate">
             </div>
+            <div class="form-group col-md-3 align-self-end ">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary" >Search</button>
     </form>
+</div>
+
+  
+
 
     <!-- Popular routes -->
     <div class="row mt-4">
         <h2 class="col-12">Popular routes</h2>
-        @foreach (var route in Model.Take(6)) // temporary
+        @foreach (var route in Model.Take(6)) 
         {
-            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+        <div class="col-lg-4 col-md-6 col-sm-12 mb-4 clickable-card" data-from="@route.RouteInfo.PlaceOfDeparture" data-to="@route.RouteInfo.PlaceOfDestination">
                 <div class="card h-100" style="border:solid 2px;">
                     <img class="card-img-top" src="~/images/image2.jpg" alt="Card image cap" style="width: 50%; height: auto;">
                     <div class="card-body">
@@ -49,13 +53,16 @@
                             var schedule = route.Schedules.First();
                             <p class="card-text">@schedule.DepartureTime.ToString("dd MMM yyyy HH:mm") - @schedule.ArrivalTime.ToString("dd MMM yyyy HH:mm")</p>
                         }
-                        <p class="card-text">Price: from [here will be price]</p> <!-- To be changed -->
+                        <p class="card-text">Price: from 754$</p> <!-- To be changed -->
                     </div>
                 </div>
             </div>
         }
+    <div class="col-12 text-center">
+        <button id="showMoreRoutes" class="btn btn-primary">Show more</button>
     </div>
-</div>
+    </div>
+
 
 
 
@@ -74,7 +81,8 @@
                 });
             });
 
-            $('#searchForm').submit(function (e) {              
+            $('#searchForm').submit(function (e) {
+              
                 var form = $(this);
                 $.ajax({
                     url: form.attr('action'),
@@ -89,39 +97,9 @@
                 });
             });
         });
+
+            $('#showMoreRoutes').click(function () {
+                window.location.href = '@Url.Action("Search", "Home")';
+            });
     </script>
 }
-
-
-
-
-
-
-
-@* @section Scripts {
-    <script>
-        var departureDateInput = document.getElementById('departureDate');
-        var returnDateInput = document.getElementById('returnDate');
-
-        function updateReturnDateMin() {
-            returnDateInput.min = departureDateInput.value;
-        }
-
-        departureDateInput.addEventListener('change', updateReturnDateMin);
-        returnDateInput.addEventListener('change', function () {
-            if (returnDateInput.value < departureDateInput.value) {
-                returnDateInput.value = departureDateInput.value;
-            }
-        });
-
-        document.getElementById('searchForm').addEventListener('submit', function (e) {
-            var departureDate = departureDateInput.value;
-            var returnDate = returnDateInput.value;
-
-            if (returnDate && departureDate && returnDate < departureDate) {
-                alert('Return date cannot be earlier than departure date.');
-                e.preventDefault();
-            }
-        });
-    </script>
-} *@
