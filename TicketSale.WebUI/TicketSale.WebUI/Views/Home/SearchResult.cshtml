@@ -132,9 +132,6 @@
     </script>
 }
 
-
-
-
 <script>
     function loadPage(pageNumber) {
         var searchParams = {
@@ -156,25 +153,13 @@
         });
     }
       
-
-        // document.querySelectorAll('.buy-ticket').forEach(button => {
-        //     button.addEventListener('click', function () {
-        //         var scheduleId = this.getAttribute('data-schedule-id');
-        //         console.log(scheduleId);
-        //         window.location.href = `/Home/Purchase?scheduleId=${scheduleId}`;
-        //     });
-        // });
         document.querySelectorAll('.buy-ticket').forEach(button => {
             button.addEventListener('click', function () {
                 var scheduleId = this.getAttribute('data-schedule-id');
-                // Fetch the price from the sibling div of the button's parent container
                 var priceContainer = this.closest('.result-item').querySelector('p > strong');
                 var price = priceContainer.nextSibling.textContent.trim().split('$')[0];
-                console.log(scheduleId, price); // Logging both for debugging
-                // Now, including the price in the URL or adjust as needed for your use case
+                console.log(scheduleId, price); 
                 window.location.href = `/Home/Purchase?scheduleId=${scheduleId}&price=${price}`;
             });
         });
-
-
 </script>
